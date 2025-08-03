@@ -1,0 +1,50 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    @apply text-[16px] font-sans;
+  }
+  body {
+    @apply bg-navy-900 text-cyan-100 overflow-x-hidden;
+  }
+}
+
+@layer components {
+  .glass-panel {
+    @apply
+      bg-navy-800/20
+      backdrop-blur-lg
+      border
+      border-cyan-500/20
+      rounded-xl
+      shadow-xl
+      shadow-cyan-500/5;
+  }
+  
+  .glow-effect {
+    @apply relative overflow-hidden;
+    &::after {
+      @apply
+        content-['']
+        absolute
+        inset-0
+        -inset-[2px]
+        rounded-lg
+        bg-cyan-400/20
+        blur-md
+        opacity-0;
+      animation: glow 2.5s ease-out infinite;
+    }
+  }
+}
+
+@keyframes glow {
+  0%, 100% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
