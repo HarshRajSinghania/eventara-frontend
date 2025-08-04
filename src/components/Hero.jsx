@@ -1,3 +1,5 @@
+import { SignUpButton, SignInButton } from '@clerk/clerk-react';
+
 export const Hero = () => {
   return (
     <div className="min-h-screen w-full flex items-center justify-center
@@ -17,16 +19,20 @@ export const Hero = () => {
           Create immersive experiences that captivate global audiences with our all-in-one webinar & conference platform
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <button className="bg-cyan-600/30 hover:bg-cyan-600/40 px-8 py-4 rounded-xl
-            border border-cyan-400/30 hover:border-cyan-300/40 transition-all
-            text-cyan-300 text-lg font-medium glow-effect">
-            Start Free Trial
-          </button>
-          <button className="bg-transparent hover:bg-cyan-500/10 px-8 py-4 rounded-xl
-            border border-cyan-400/20 hover:border-cyan-300/30 transition-all
-            text-cyan-300 text-lg font-medium">
-            Watch Demo
-          </button>
+          <SignUpButton mode="modal">
+            <button className="bg-cyan-600/30 hover:bg-cyan-600/40 px-8 py-4 rounded-xl
+              border border-cyan-400/30 hover:border-cyan-300/40 transition-all
+              text-cyan-300 text-lg font-medium glow-effect">
+              Get Started Free
+            </button>
+          </SignUpButton>
+          <SignInButton mode="modal">
+            <button className="bg-transparent hover:bg-cyan-500/10 px-8 py-4 rounded-xl
+              border border-cyan-400/20 hover:border-cyan-300/30 transition-all
+              text-cyan-300 text-lg font-medium">
+              Sign In
+            </button>
+          </SignInButton>
         </div>
         
         {/* Client logos */}
