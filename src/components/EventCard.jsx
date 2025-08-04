@@ -1,9 +1,12 @@
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@clerk/clerk-react';
+import { useState } from 'react';
+import { Calendar, MapPin, Users, DollarSign, Edit3, Trash2, Eye } from 'lucide-react';
 
 export const EventCard = ({ event, onDelete, onRefresh }) => {
   const navigate = useNavigate();
-  const { getToken } = useAuth();
+  const { getToken, userId } = useAuth();
+  const [isHovered, setIsHovered] = useState(false);
   
   const getStatus = (startDate, endDate) => {
     const now = new Date();
@@ -51,79 +54,114 @@ export const EventCard = ({ event, onDelete, onRefresh }) => {
   };
 
   const status = getStatus(event.startDate, event.endDate);
-  const statusColors = {
-    Live: 'from-green-400/40 to-emerald-600/30',
-    Scheduled: 'from-blue-400/40 to-cyan-600/30',
-    Ended: 'from-purple-400/40 to-indigo-600/30'
+  const statusConfig = {
+    Live: {
+      bg: 'from-emerald-500/20 to-green-600/20',
+      text: 'text-emerald-400',
+      border: 'border-emerald-500/30',
+      glow: 'shadow-emerald-500/20'
+    },
+    Scheduled: {
+      bg: 'from-cyan-500/20 to-blue-600/20',
+      text: 'text-cyan-400',
+      border: 'border-cyan-500/30',
+      glow: 'shadow-cyan-500/20'
+    },
+    Ended: {
+      bg: 'from-purple-500/20 to-indigo-600/20',
+      text: 'text-purple-400',
+      border: 'border-purple-500/30',
+      glow: 'shadow-purple-500/20'
+    }
   };
 
+  const config = statusConfig[status];
+
   return (
-    <div className="group relative bg-navy-800/40 backdrop-blur-sm rounded-xl p-6
-      border border-cyan-500/20 hover:border-cyan-400/30 transition-all
-      hover:shadow-lg hover:shadow-cyan-500/10">
-      <div className={`absolute inset-0 bg-gradient-to-br ${statusColors[status]}
-        rounded-xl opacity-50 -z-10`} />
+    <div
+      className="group relative glass-panel-strong p-6 rounded-2xl border transition-all duration-300 cursor-pointer card-hover"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      onClick={handleViewDetails}
+    >
+      <div className={`absolute inset-0 bg-gradient-to-br ${config.bg} rounded-2xl opacity-60`} />
+      <div className={`absolute inset-0 rounded-2xl border-2 ${config.border} opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${config.glow}`} />
       
-      <div className="flex justify-between items-start mb-4">
-        <div className="flex-1">
-          <h3 className="text-lg font-semibold text-cyan-100 mb-1">{event.title}</h3>
-          <p className="text-sm text-cyan-400/80">
-            {new Date(event.startDate).toLocaleDateString()} - {new Date(event.endDate).toLocaleDateString()}
+      {/* Status badge */}
+      <div className="absolute top-4 right-4">
+        <span className={`px-3 py-1 rounded-full text-sm font-bold ${config.text} bg-black/20 backdrop-blur-sm border ${config.border}`}>
+          {status}
+        </span>
+      </div>
+      
+      <div className="relative z-10">
+        <div className="mb-4">
+          <h3 className="text-xl font-bold text-white mb-2 line-clamp-2">{event.title}</h3>
+          <p className="text-sm text-cyan-300/80 flex items-center gap-2">
+            <Calendar size={14} />
+            {new Date(event.startDate).toLocaleDateString('en-US', {
+              month: 'short',
+              day: 'numeric',
+              year: 'numeric'
+            })}
           </p>
-          <p className="text-xs text-cyan-100/60">{event.location}</p>
+          <p className="text-xs text-cyan-300/60 flex items-center gap-2 mt-1">
+            <MapPin size={12} />
+            {event.location}
+          </p>
         </div>
-        <div className="flex flex-col items-end gap-2">
-          <span className={`px-3 py-1 rounded-full text-sm font-medium
-            ${status === 'Live' ? 'bg-green-500/20 text-green-400' :
-              status === 'Scheduled' ? 'bg-blue-500/20 text-blue-400' :
-              'bg-purple-500/20 text-purple-400'}`}>
-            {status}
-          </span>
-          <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+        
+        <div className="space-y-3 mb-4">
+          <div className="flex items-center justify-between text-sm">
+            <span className="text-cyan-300/80 flex items-center gap-2">
+              <Users size={14} />
+              Capacity
+            </span>
+            <span className="text-white font-semibold">{event.capacity || 0}</span>
+          </div>
+          
+          <div className="flex items-center justify-between text-sm">
+            <span className="text-cyan-300/80 flex items-center gap-2">
+              <DollarSign size={14} />
+              Price
+            </span>
+            <span className="text-white font-semibold">${event.price || 0}</span>
+          </div>
+          
+          {event.sessions && event.sessions.length > 0 && (
+            <div className="text-xs text-cyan-300/60">
+              {event.sessions.length} session{event.sessions.length !== 1 ? 's' : ''} included
+            </div>
+          )}
+        </div>
+        
+        {/* Action buttons */}
+        <div className="flex items-center justify-between pt-4 border-t border-cyan-500/20">
+          <button
+            onClick={handleViewDetails}
+            className="flex items-center gap-2 text-cyan-300 hover:text-cyan-100 transition-colors duration-200"
+          >
+            <Eye size={16} />
+            <span className="text-sm font-medium">View Details</span>
+          </button>
+          
+          <div className={`flex gap-2 transition-all duration-300 ${isHovered ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-4'}`}>
             <button
               onClick={handleEdit}
-              className="p-1 text-cyan-300 hover:text-cyan-200"
+              className="p-2 text-cyan-300 hover:text-cyan-100 hover:bg-cyan-500/20 rounded-lg transition-all duration-200"
               title="Edit Event"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-              </svg>
+              <Edit3 size={16} />
             </button>
             <button
               onClick={handleDelete}
-              className="p-1 text-red-400 hover:text-red-300"
+              className="p-2 text-red-400 hover:text-red-300 hover:bg-red-500/20 rounded-lg transition-all duration-200"
               title="Delete Event"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-              </svg>
+              <Trash2 size={16} />
             </button>
           </div>
         </div>
-      </div>
-      
-      <div className="mt-4 space-y-2">
-        <div className="flex items-center justify-between text-cyan-300/80 text-sm">
-          <span>Capacity: {event.capacity || 0}</span>
-          <span>${event.price || 0}</span>
-        </div>
-        {event.sessions && event.sessions.length > 0 && (
-          <p className="text-xs text-cyan-100/60">
-            {event.sessions.length} session{event.sessions.length !== 1 ? 's' : ''}
-          </p>
-        )}
-      </div>
-      
-      <div className="mt-4 flex items-center justify-between">
-        <button
-          onClick={handleViewDetails}
-          className="flex items-center hover:text-cyan-200 transition-colors text-sm text-cyan-300/80 cursor-pointer"
-        >
-          <span className="mr-2">View Details</span>
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"/>
-          </svg>
-        </button>
       </div>
     </div>
   );

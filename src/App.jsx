@@ -10,6 +10,13 @@ import { Dashboard } from './components/Dashboard';
 import { CreateEvent } from './components/CreateEvent';
 import { EventDetails } from './components/EventDetails';
 import { EditEvent } from './components/EditEvent';
+import { Features } from './pages/Features';
+import { Stats } from './pages/Stats';
+import { Contact } from './pages/Contact';
+import { About } from './pages/About';
+import { Careers } from './pages/Careers';
+import { PrivacyPolicy } from './pages/PrivacyPolicy';
+import { TermsConditions } from './pages/TermsConditions';
 
 function HomePage() {
   return (
@@ -29,7 +36,7 @@ function AppContent() {
     <Router>
       <div className="min-h-screen bg-gradient-to-br from-navy-900 to-violet-900/60">
         <Header />
-        <main className="space-y-20">
+        <main className="space-y-20 pt-20">
           <Routes>
             <Route
               path="/"
@@ -51,6 +58,13 @@ function AppContent() {
               path="/events/:id/edit"
               element={isSignedIn ? <EditEvent /> : <Navigate to="/" replace />}
             />
+            <Route path="/features" element={<Features />} />
+            <Route path="/stats" element={<Stats />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/careers" element={<Careers />} />
+            <Route path="/privacy" element={<PrivacyPolicy />} />
+            <Route path="/terms" element={<TermsConditions />} />
           </Routes>
         </main>
         <Footer />
